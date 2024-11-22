@@ -1,0 +1,6 @@
+#!/bin/bash
+print_ref() {
+    echo "Options:"
+    echo "-u, --users" 
+}
+    
