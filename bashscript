@@ -26,10 +26,10 @@ print_pid() {
 while getopts ":uphl:e:-:" opt; do
     case $opt in
         u | -u | --users)
-            display_users=true
+            print_usr
             ;;
         p | -p | --processes)
-            display_processes=true
+            print_pid
             ;;
         h | -h | --help)
             print_ref
@@ -63,13 +63,4 @@ fi
 # Empty args
 if [ $((OPTIND - 1)) -eq 0 ]; then
     print_ref
-fi
-
-# Display results based on the flags set
-if [[ "$display_users" == true ]]; then
-    print_usr
-fi
-
-if [[ "$display_processes" == true ]]; then
-    print_pid
 fi
