@@ -53,6 +53,7 @@ done
 
 # Redirect output if specified
 if [ -n "$log_path" ]; then
+    validate_path "$log_path" || exit 1
     exec > "$log_path"
 fi
 
