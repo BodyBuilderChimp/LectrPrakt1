@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#Output reference
+# Output reference
 print_ref() {
     echo "Usage: $(basename "$0") [OPTIONS]"
     echo "Options:"
@@ -12,32 +12,32 @@ print_ref() {
     exit 0
 }
 
-#users and dirs
+# Users and dirs
 print_usr() {
-    cat /etc/passwd | cut -d: -f1,6 | sort
+    cut -d: -f1,6 /etc/passwd | sort
 }
 
-#processes
+# Processes
 print_pid() {
     ps -e --sort=pid
 }
 
-#pars
+# Parse options
 while getopts ":uphl:e:-:" opt; do
     case $opt in
-        u | -u | -\-users)
-            display_users
+        u | -u | --users)
+            display_users=true
             ;;
-        p | -p | -\-processes)
-            display_processes
+        p | -p | --processes)
+            display_processes=true
             ;;
-        h | -h | -\-help)
-            print_help
+        h | -h | --help)
+            print_ref
             ;;
-        l | -l | -\-log)
+        l)
             log_path=$OPTARG
             ;;
-        e | -e | -\-errors)
+        e)
             error_path=$OPTARG
             ;;
         :)
@@ -51,7 +51,7 @@ while getopts ":uphl:e:-:" opt; do
     esac
 done
 
-#errors
+# Redirect output if specified
 if [ -n "$log_path" ]; then
     exec > "$log_path"
 fi
@@ -60,7 +60,16 @@ if [ -n "$error_path" ]; then
     exec 2> "$error_path"
 fi
 
-#empty args
-if [ $# -eq 0 ]; then
+# Empty args
+if [ $((OPTIND - 1)) -eq 0 ]; then
     print_ref
+fi
+
+# Display results based on the flags set
+if [[ "$display_users" == true ]]; then
+    print_usr
+fi
+
+if [[ "$display_processes" == true ]]; then
+    print_pid
 fi
