@@ -14,7 +14,7 @@ print_ref() {
 
 # Users and dirs
 print_usr() {
-    cut -d: -f1,6 /etc/passwd | sort
+    awk -F: '$3 >= 1000 {print $1 "\t" $6}' /etc/passwd | sort
 }
 
 # Processes
@@ -22,22 +22,32 @@ print_pid() {
     ps -e --sort=pid
 }
 
+# Path validation
+validate_path() {
+  local path="$1"
+  if [[ ! -d "$(dirname "$path")" ]]; then
+    echo "Invalid path '$path'" >&2
+    return 1
+  fi
+  return 0
+}
+
 # Parse options
 while getopts ":uphl:e:-:" opt; do
     case $opt in
-        u | -u | --users)
+        -u | --users)
             print_usr
             ;;
-        p | -p | --processes)
+        -p | --processes)
             print_pid
             ;;
-        h | -h | --help)
+        -h | --help)
             print_ref
             ;;
-        l)
+        -l | --log)
             log_path=$OPTARG
             ;;
-        e)
+        -e | --errors)
             error_path=$OPTARG
             ;;
         :)
@@ -58,6 +68,7 @@ if [ -n "$log_path" ]; then
 fi
 
 if [ -n "$error_path" ]; then
+    validate_path "$error_path" || exit 1
     exec 2> "$error_path"
 fi
 
