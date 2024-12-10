@@ -32,30 +32,45 @@ validate_path() {
   return 0
 }
 
-# Parse options
-while getopts ":uphl:e:-:" opt; do
-    case $opt in
+# Parse options using getopt
+OPTIONS=$(getopt -o uphl:e: --long users,processes,help,log:,errors: -- "$@")
+if [ $? -ne 0 ]; then
+    print_ref
+fi
+eval set -- "$OPTIONS"
+
+# Initialize variables
+log_path=""
+error_path=""
+
+# Process options
+while true; do
+    case "$1" in
         -u|--users)
-            print_usr
+            display_users=true
+            shift
             ;;
         -p|--processes)
-            print_pid
+            display_processes=true
+            shift
             ;;
         -h|--help)
             print_ref
             ;;
         -l|--log)
-            log_path=$OPTARG
+            log_path="$2"
+            shift 2
             ;;
         -e|--errors)
-            error_path=$OPTARG
+            error_path="$2"
+            shift 2
             ;;
-        :)
-            echo "Option -$OPTARG requires an argument." >&2
-            exit 1
+        --)
+            shift
+            break
             ;;
-        ?)
-            echo "Invalid option: -$OPTARG" >&2
+        *)
+            echo "Invalid option: $1" >&2
             exit 1
             ;;
     esac
@@ -72,7 +87,16 @@ if [ -n "$error_path" ]; then
     exec 2> "$error_path"
 fi
 
+# Check which option was selected to display output
+if [[ "$display_users" == true ]]; then
+    print_usr
+fi
+
+if [[ "$display_processes" == true ]]; then
+    print_pid
+fi
+
 # Empty args
-if [ $((OPTIND - 1)) -eq 0 ]; then
+if [ -z "$display_users" ] && [ -z "$display_processes" ]; then
     print_ref
 fi
