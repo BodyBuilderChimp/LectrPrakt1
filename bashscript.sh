@@ -35,19 +35,19 @@ validate_path() {
 # Parse options
 while getopts ":uphl:e:-:" opt; do
     case $opt in
-        -u | --users)
+        -u|--users)
             print_usr
             ;;
-        -p | --processes)
+        -p|--processes)
             print_pid
             ;;
-        -h | --help)
+        -h|--help)
             print_ref
             ;;
-        -l | --log)
+        -l|--log)
             log_path=$OPTARG
             ;;
-        -e | --errors)
+        -e|--errors)
             error_path=$OPTARG
             ;;
         :)
